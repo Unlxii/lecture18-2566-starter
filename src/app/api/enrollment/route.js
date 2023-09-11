@@ -1,14 +1,30 @@
 import { DB } from "@/app/libs/DB";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+import jsonwebtoken from "jsonwebtoken";
 
 export const GET = async (request) => {
-  // return NextResponse.json(
-  //   {
-  //     ok: false,
-  //     message: "Invalid token",
-  //   },
-  //   { status: 401 }
-  // );
+  const rawAuthHeader = headers().get("authorization");
+
+  //bearer
+  const token = rawAuthHeader.split(" ")[1];
+  //split [bearer , dflkajsdkfjaskdfjlkasdjfkldsaf];
+
+  let studentId = null;
+  console.log(rawAuthHeader);
+  console.log(token);
+  try {
+    const payload = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+    studentId = payload.studentId;
+  } catch {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Invalid token",
+      },
+      { status: 401 }
+    );
+  }
 
   const courseNoList = [];
   for (const enroll of DB.enrollments) {
@@ -23,6 +39,27 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
+  const rawAuthHeader = headers().get("authorization");
+
+  //bearer
+  const token = rawAuthHeader.split(" ")[1];
+  //split [bearer , dflkajsdkfjaskdfjlkasdjfkldsaf];
+
+  let studentId = null;
+  console.log(rawAuthHeader);
+  console.log(token);
+  try {
+    const payload = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+    studentId = payload.studentId;
+  } catch {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Invalid token",
+      },
+      { status: 401 }
+    );
+  }
   //read body request
   const body = await request.json();
   const { courseNo } = body;
